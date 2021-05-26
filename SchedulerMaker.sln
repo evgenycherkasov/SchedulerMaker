@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31129.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulerMaker", "Scheduler Maker\SchedulerMaker.csproj", "{716B249C-D840-4DFD-8131-7E3D52ADF099}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{716B249C-D840-4DFD-8131-7E3D52ADF099}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{716B249C-D840-4DFD-8131-7E3D52ADF099}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{716B249C-D840-4DFD-8131-7E3D52ADF099}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{716B249C-D840-4DFD-8131-7E3D52ADF099}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2E8A6FD7-BD63-4971-9101-DB0D36742031}
+	EndGlobalSection
+EndGlobal
