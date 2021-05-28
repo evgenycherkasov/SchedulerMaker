@@ -9,19 +9,12 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
 {
     class OperationTimesRepository : IRepository<IOperationTime>
     {
-        private IContext<IOperationTime> _context = null;
-
-        public OperationTimesRepository(IContext<IOperationTime> context)
-        {
-            _context = context;
-        }
-
         public IEnumerable<IOperationTime> GetDataList()
         {
             throw new NotImplementedException();
         }
 
-        public void WriteDataList(IEnumerable<IOperationTime> data)
+        public void WriteDataList(IEnumerable<IOperationTime> data, string path)
         {
             throw new NotImplementedException();
         }

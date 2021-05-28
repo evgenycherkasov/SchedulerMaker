@@ -9,11 +9,11 @@
         d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" 
-        Height="450" 
-        Width="850"
+        Height="500" 
+        Width="900"
         WindowStyle="ToolWindow"
-        MinHeight="450"
-        MinWidth="850">
+        MinHeight="500"
+        MinWidth="900">
     <Grid>
         <TabControl TabStripPlacement="Left"
                     Style="{StaticResource MaterialDesignNavigatilRailTabControl}">
@@ -39,6 +39,20 @@
                     <Setter Property="AutoGenerateColumns" Value="False"/>
                 </Style>
             </TabControl.Resources>
+            <TabItem Header="Основное меню">
+                <TabItem.Content>
+                    <StackPanel Orientation="Vertical"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center">
+                        <Button Content="Загрузить данные для формирования расписания"
+                                Margin="10"
+                                Command=""/>
+                        <Button Content="Составить расписание"
+                                Margin="10"
+                                Command=""/>
+                    </StackPanel>
+                </TabItem.Content>
+            </TabItem>
             <TabItem Header="Партии">
                 <TabItem.Content>
                     <Grid>
@@ -62,7 +76,8 @@
                 </TabItem.Content>
             </TabItem>
             <TabItem Header="Номенклатуры">
-                <Grid>
+                <TabItem.Content>
+                    <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="50"/>
@@ -80,8 +95,10 @@
                     <Button Content="Получить данные о номенклатурах"
                             Command="{Binding ReadNomenclaturesCommand}"/>
                 </Grid>
+                </TabItem.Content>
             </TabItem>
             <TabItem Header="Оборудование">
+                <TabItem.Content>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -100,8 +117,10 @@
                     <Button Content="Получить данные об оборудовании"
                             Command="{Binding ReadMachineToolsCommand}"/>
                 </Grid>
+                </TabItem.Content>
             </TabItem>
             <TabItem Header="Операции">
+                <TabItem.Content>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -126,6 +145,7 @@
                     <Button Content="Получить данные о времени выполнения операций"
                             Command="{Binding ReadOperationTimesCommand}"/>
                 </Grid>
+                </TabItem.Content>
             </TabItem>
             <TabItem Header="Расписание">
                 

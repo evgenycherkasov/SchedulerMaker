@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{716B249C-D840-4DFD-8131-7E3D52ADF099}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Scheduler_Maker</RootNamespace>
-    <AssemblyName>Scheduler Maker</AssemblyName>
+    <RootNamespace>SchedulerMaker</RootNamespace>
+    <AssemblyName>SchedulerMaker</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -39,6 +39,9 @@
   <ItemGroup>
     <Reference Include="ExcelDataReader, Version=3.6.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
       <HintPath>..\packages\ExcelDataReader.3.6.0\lib\net45\ExcelDataReader.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelDataReader.DataSet, Version=3.6.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDataReader.DataSet.3.6.0\lib\net35\ExcelDataReader.DataSet.dll</HintPath>
     </Reference>
     <Reference Include="MaterialDesignColors, Version=2.0.1.2556, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignColors.2.0.1\lib\net452\MaterialDesignColors.dll</HintPath>
@@ -85,8 +88,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Models\Contexts\ExcelContext.cs" />
-    <Compile Include="Models\Interfaces\IContext.cs" />
+    <Compile Include="Models\Contexts\Excel\ExcelMachineToolsContext.cs" />
+    <Compile Include="Models\Contexts\Excel\ExcelNomenclaturesContext.cs" />
+    <Compile Include="Models\Contexts\Excel\ExcelPartiesContext.cs" />
+    <Compile Include="Models\Interfaces\IData.cs" />
     <Compile Include="Models\Interfaces\IMachineTool.cs" />
     <Compile Include="Models\Interfaces\INomenclature.cs" />
     <Compile Include="Models\Interfaces\IOperationTime.cs" />

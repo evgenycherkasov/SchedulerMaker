@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace SchedulerMaker.Models.Interfaces
 {
-    interface ISchedule
+    interface ISchedule : IData
     {
-        int Id { get; set; }
-
         IPart Part { get; set; }
 
         IMachineTool MachineTool { get; set; }

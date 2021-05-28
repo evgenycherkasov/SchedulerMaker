@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace SchedulerMaker.Models.Interfaces
 {
-    interface IRepository<T>
-        where T : class
+    interface IRepository<IData>
     {
-        IEnumerable<T> GetDataList();
+        IEnumerable<IData> GetDataList();
 
-        void WriteDataList(IEnumerable<T> data);
+        void WriteDataList(IEnumerable<IData> data, string path);
     }
 }

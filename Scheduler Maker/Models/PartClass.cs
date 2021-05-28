@@ -9,8 +9,14 @@ namespace SchedulerMaker.Models
 {
     class PartClass : IPart
     {
-        public int Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int Id { get; set; }
 
-        public int NomenclatureId { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int NomenclatureId { get; set; }
+
+        public PartClass(int id, int nomenclatureId)
+        {
+            Id = id;
+            NomenclatureId = nomenclatureId;
+        }
     }
 }

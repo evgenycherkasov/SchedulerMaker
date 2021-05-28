@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace SchedulerMaker.Models.Interfaces
 {
-    interface IContext<T>
-        where T : class
+    interface IData
     {
-        IEnumerable<T> GetDataList();
-
-        void ReadDataList(IEnumerable<T> data);
+        int Id { get; set; }
     }
 }

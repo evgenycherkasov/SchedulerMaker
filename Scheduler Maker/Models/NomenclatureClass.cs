@@ -9,8 +9,14 @@ namespace SchedulerMaker.Models
 {
     class NomenclatureClass : INomenclature
     {
-        public int Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int Id { get; set; }
 
-        public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string Name { get; set; }
+
+        public NomenclatureClass(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
     }
 }

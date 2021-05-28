@@ -4,26 +4,79 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data;
+using ExcelDataReader;
+using System.IO;
+using SchedulerMaker.Models;
+using SchedulerMaker.Models.Contexts.Excel;
 
 namespace SchedulerMaker.Repositories.ExcelRepositories
 {
     class PartRepository : IRepository<IPart>
     {
-        private IContext<IPart> _context = null;
+        private ExcelPartiesContext _excelContext = null;
 
-        public PartRepository(IContext<IPart> context)
+        private readonly string _idFieldName = "id";
+        private readonly string _nomenclatureIdFieldName = "nomenclature id";
+
+        public PartRepository(ExcelPartiesContext excelPartiesContext)
         {
-            _context = context;
+            _excelContext = excelPartiesContext;
         }
 
         public IEnumerable<IPart> GetDataList()
         {
+            //TODO: обработать IOException
+            DataSet partiesDataSet = _excelContext.PartiesDataSet;
+            ValidateDataSet(partiesDataSet);
+            DataTable partiesTable = partiesDataSet.Tables[0];
+            List<IPart> partiesList = new List<IPart>();
+            for (int i = 1; i < partiesTable.Rows.Count; ++i)
+            {
+                DataRow row = partiesTable.Rows[i];
+                int id = Convert.ToInt32(row[0]);
+                int nomenclatureId = Convert.ToInt32(row[1]);
+                PartClass part = new PartClass(id, nomenclatureId);
+
+                if (partiesList.Any((t) => t.Id == part.Id))
+                {
+                    throw new ApplicationException("Есть совпадающие идентификаторы партии");
+                }
+                partiesList.Add(part);
+            }
+            return partiesList;
+        }
+
+        public void WriteDataList(IEnumerable<IPart> data, string path)
+        {
             throw new NotImplementedException();
         }
 
-        public void WriteDataList(IEnumerable<IPart> data)
+        private void ValidateDataSet(DataSet data)
         {
-            throw new NotImplementedException();
+            /*
+             * Не проверяю на содержание хотя бы одного листа, так как
+             * в Excel файле всегда как минимум один лист
+             */
+            if (data.Tables.Count > 1)
+            {
+                throw new ApplicationException("Слишком много листов в файле");
+            }
+            DataTable table = data.Tables[0];
+            if (table.Columns.Count > 2)
+            {
+                throw new ApplicationException("Слишком много столбцов в таблице");
+            }
+            if (table.Rows.Count < 2)
+            {
+                throw new ApplicationException("Нет данных в таблице");
+            }
+            DataRow firstRow = table.Rows[0];
+
+            if (firstRow[0].ToString() != _idFieldName || firstRow[1].ToString() != _nomenclatureIdFieldName)
+            {
+                throw new ApplicationException($"Не найдены соответствующие столбцы {_idFieldName} и {_nomenclatureIdFieldName} для партии");
+            }
         }
     }
 }

@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace SchedulerMaker.Models.Interfaces
 {
-    interface IOperationTime
+    interface IOperationTime : IData
     {
-        int Id { get; set; }
-
         int MachineToolId { get; set; }
 
         int NomenclatureId { get; set; }
