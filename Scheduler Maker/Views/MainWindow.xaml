@@ -8,10 +8,10 @@
         xmlns:viewmodels="clr-namespace:SchedulerMaker.ViewModels" 
         d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
         mc:Ignorable="d"
-        Title="MainWindow" 
+        Title="Scheduler Maker" 
         Height="500" 
         Width="900"
-        WindowStyle="ToolWindow"
+        WindowStyle="SingleBorderWindow"
         MinHeight="500"
         MinWidth="900">
     <Grid>
@@ -46,7 +46,7 @@
                                 HorizontalAlignment="Center">
                         <Button Content="Загрузить данные для формирования расписания"
                                 Margin="10"
-                                Command=""/>
+                                Command="{Binding UploadAllData}"/>
                         <Button Content="Составить расписание"
                                 Margin="10"
                                 Command=""/>
@@ -127,18 +127,15 @@
                         <RowDefinition Height="50"/>
                     </Grid.RowDefinitions>
                     <DataGrid ItemsSource="{Binding OperationTimes}">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" 
-                                    Binding="{Binding Id}"
-                                    Width="*"/>
-                            <DataGridTextColumn Header="ID оборудования" 
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID оборудования" 
                                     Binding="{Binding MachineToolId}" 
                                     Width="*"/>
                             <DataGridTextColumn Header="ID номенклатуры" 
                                     Binding="{Binding NomenclatureId}" 
                                     Width="*"/>
                             <DataGridTextColumn Header="Время выполнения, с" 
-                                    Binding="{Binding OperationTime}" 
+                                    Binding="{Binding ExecutionTime}" 
                                     Width="*"/>
                         </DataGrid.Columns>
                     </DataGrid>

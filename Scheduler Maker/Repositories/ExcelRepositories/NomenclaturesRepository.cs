@@ -1,9 +1,10 @@
-﻿using SchedulerMaker.Models;
-using SchedulerMaker.Models.Contexts.Excel;
+﻿using ExcelDataReader;
+using SchedulerMaker.Models;
 using SchedulerMaker.Models.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,19 +13,25 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
 {
     class NomenclaturesRepository : IRepository<INomenclature>
     {
-        private ExcelNomenclaturesContext _excelContext = null;
-
         private readonly string _idFieldName = "id";
         private readonly string _nomenclatureFieldName = "nomenclature";
+        private readonly DataSet _nomenclatures = null;
 
-        public NomenclaturesRepository(ExcelNomenclaturesContext excelNomenclaturesContext)
+        public NomenclaturesRepository(string path)
         {
-            _excelContext = excelNomenclaturesContext;
+            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read))
+            {
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                {
+                    var result = reader.AsDataSet();
+                    _nomenclatures = result;
+                }
+            }
         }
         public IEnumerable<INomenclature> GetDataList()
         {
             //TODO: обработать IOException
-            DataSet nomenclaturesDataSet = _excelContext.NomenclaturesDataSet;
+            DataSet nomenclaturesDataSet = _nomenclatures;
             ValidateDataSet(nomenclaturesDataSet);
             DataTable nomenclaturesTable = nomenclaturesDataSet.Tables[0];
             List<INomenclature> nomenclaturesList = new List<INomenclature>();
@@ -33,7 +40,7 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
                 DataRow row = nomenclaturesTable.Rows[i];
                 int id = Convert.ToInt32(row[0]);
                 string nomenclatureName = Convert.ToString(row[1]);
-                NomenclatureClass nomenclature = new NomenclatureClass(id, nomenclatureName);
+                Nomenclature nomenclature = new Nomenclature(id, nomenclatureName);
 
                 if (nomenclaturesList.Any((t) => t.Id == nomenclature.Id))
                 {

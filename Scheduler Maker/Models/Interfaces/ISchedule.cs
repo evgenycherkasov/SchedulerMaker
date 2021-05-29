@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SchedulerMaker.Models.Interfaces
+﻿namespace SchedulerMaker.Models.Interfaces
 {
-    interface ISchedule : IData
+    interface ISchedule
     {
-        IPart Part { get; set; }
+        IPart Part { get; }
 
-        IMachineTool MachineTool { get; set; }
+        IMachineTool MachineTool { get; }
 
-        int StartTime { get; set; }
+        int StartTime { get; }
 
-        int EndTime { get; set; }
+        int EndTime { get; }
     }
 }

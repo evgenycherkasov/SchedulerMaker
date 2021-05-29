@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SchedulerMaker.Models.Interfaces
+﻿namespace SchedulerMaker.Models.Interfaces
 {
-    interface IOperationTime : IData
+    interface IOperationTime
     {
-        int MachineToolId { get; set; }
+        int MachineToolId { get; }
 
-        int NomenclatureId { get; set; }
+        int NomenclatureId { get; }
 
-        int OperationTime { get; set; }
+        int ExecutionTime { get; }
     }
 }

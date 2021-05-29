@@ -88,21 +88,17 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Models\Contexts\Excel\ExcelMachineToolsContext.cs" />
-    <Compile Include="Models\Contexts\Excel\ExcelNomenclaturesContext.cs" />
-    <Compile Include="Models\Contexts\Excel\ExcelPartiesContext.cs" />
-    <Compile Include="Models\Interfaces\IData.cs" />
     <Compile Include="Models\Interfaces\IMachineTool.cs" />
     <Compile Include="Models\Interfaces\INomenclature.cs" />
     <Compile Include="Models\Interfaces\IOperationTime.cs" />
     <Compile Include="Models\Interfaces\IPart.cs" />
     <Compile Include="Models\Interfaces\IRepository.cs" />
     <Compile Include="Models\Interfaces\ISchedule.cs" />
-    <Compile Include="Models\MachineToolClass.cs" />
-    <Compile Include="Models\NomenclatureClass.cs" />
-    <Compile Include="Models\OperationTimeClass.cs" />
-    <Compile Include="Models\PartClass.cs" />
-    <Compile Include="Models\ScheduleClass.cs" />
+    <Compile Include="Models\MachineTool.cs" />
+    <Compile Include="Models\Nomenclature.cs" />
+    <Compile Include="Models\OperationTime.cs" />
+    <Compile Include="Models\Part.cs" />
+    <Compile Include="Models\Schedule.cs" />
     <Compile Include="Repositories\ExcelRepositories\MachineToolsRepository.cs" />
     <Compile Include="Repositories\ExcelRepositories\NomenclaturesRepository.cs" />
     <Compile Include="Repositories\ExcelRepositories\OperationTimesRepository.cs" />

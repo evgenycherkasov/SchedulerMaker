@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SchedulerMaker.Models.Interfaces
+﻿namespace SchedulerMaker.Models.Interfaces
 {
-    interface INomenclature : IData
+    interface INomenclature
     {
-        string Name { get; set; }
+        int Id { get; }
+
+        string Name { get; }
     }
 }

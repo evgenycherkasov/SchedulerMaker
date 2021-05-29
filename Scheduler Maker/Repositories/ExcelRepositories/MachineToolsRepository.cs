@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using ExcelDataReader;
 using SchedulerMaker.Models;
-using SchedulerMaker.Models.Contexts.Excel;
 using SchedulerMaker.Models.Interfaces;
 
 
@@ -15,20 +14,26 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
 {
     class MachineToolsRepository : IRepository<IMachineTool>
     {
-        private ExcelMachineToolsContext _excelContext = null;
-
         private readonly string _idFieldName = "id";
         private readonly string _nomenclatureFieldName = "name";
+        private readonly DataSet _machineTools = null;
 
-        public MachineToolsRepository(ExcelMachineToolsContext excelMachineToolsContext)
+        public MachineToolsRepository(string path)
         {
-            _excelContext = excelMachineToolsContext;
+            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read))
+            {
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                {
+                    var result = reader.AsDataSet();
+                    _machineTools = result;
+                }
+            }
         }
 
         public IEnumerable<IMachineTool> GetDataList()
         {
             //TODO: обработать IOException
-            DataSet machineToolsDataSet = _excelContext.MachineToolsDataSet;
+            DataSet machineToolsDataSet = _machineTools;
             ValidateDataSet(machineToolsDataSet);
             DataTable machineToolsTable = machineToolsDataSet.Tables[0];
             List<IMachineTool> machineToolsList = new List<IMachineTool>();
@@ -37,7 +42,7 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
                 DataRow row = machineToolsTable.Rows[i];
                 int id = Convert.ToInt32(row[0]);
                 string name = Convert.ToString(row[1]);
-                MachineToolClass machineTool = new MachineToolClass(id, name);
+                MachineTool machineTool = new MachineTool(id, name);
 
                 if (machineToolsList.Any((t) => t.Id == machineTool.Id))
                 {

@@ -8,26 +8,31 @@ using System.Data;
 using ExcelDataReader;
 using System.IO;
 using SchedulerMaker.Models;
-using SchedulerMaker.Models.Contexts.Excel;
 
 namespace SchedulerMaker.Repositories.ExcelRepositories
 {
     class PartRepository : IRepository<IPart>
     {
-        private ExcelPartiesContext _excelContext = null;
-
         private readonly string _idFieldName = "id";
         private readonly string _nomenclatureIdFieldName = "nomenclature id";
+        private readonly DataSet _parties = null;
 
-        public PartRepository(ExcelPartiesContext excelPartiesContext)
+        public PartRepository(string path)
         {
-            _excelContext = excelPartiesContext;
+            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read))
+            {
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                {
+                    var result = reader.AsDataSet();
+                    _parties = result;
+                }
+            }
         }
 
         public IEnumerable<IPart> GetDataList()
         {
             //TODO: обработать IOException
-            DataSet partiesDataSet = _excelContext.PartiesDataSet;
+            DataSet partiesDataSet = _parties;
             ValidateDataSet(partiesDataSet);
             DataTable partiesTable = partiesDataSet.Tables[0];
             List<IPart> partiesList = new List<IPart>();
@@ -36,7 +41,7 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
                 DataRow row = partiesTable.Rows[i];
                 int id = Convert.ToInt32(row[0]);
                 int nomenclatureId = Convert.ToInt32(row[1]);
-                PartClass part = new PartClass(id, nomenclatureId);
+                Part part = new Part(id, nomenclatureId);
 
                 if (partiesList.Any((t) => t.Id == part.Id))
                 {
