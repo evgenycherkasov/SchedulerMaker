@@ -23,129 +23,36 @@
                     <Setter Property="Width" Value="150"/>
                     <Setter Property="Height" Value="Auto"/>
                 </Style>
-                <Style TargetType="Button"
-                       BasedOn="{StaticResource MaterialDesignFlatButton}">
-                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                    <Setter Property="VerticalAlignment" Value="Center"/>
-                    <Setter Property="Grid.Row" Value="1"/>
-                </Style>
-                <Style TargetType="DataGrid"
-                       BasedOn="{StaticResource MaterialDesignDataGrid}">
-                    <Setter Property="Grid.Row" Value="0"/>
-                    <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
-                    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
-                    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
-                    <Setter Property="IsReadOnly" Value="True"/>
-                    <Setter Property="AutoGenerateColumns" Value="False"/>
-                </Style>
             </TabControl.Resources>
             <TabItem Header="Основное меню">
                 <TabItem.Content>
-                    <StackPanel Orientation="Vertical"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Center">
-                        <Button Content="Загрузить данные для формирования расписания"
-                                Margin="10"
-                                Command="{Binding UploadAllData}"/>
-                        <Button Content="Составить расписание"
-                                Margin="10"
-                                Command=""/>
-                    </StackPanel>
+                    <Frame Content="{Binding MainMenuPage}"/>
                 </TabItem.Content>
             </TabItem>
             <TabItem Header="Партии">
                 <TabItem.Content>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="50"/>
-                        </Grid.RowDefinitions>
-                        <DataGrid ItemsSource="{Binding Parties}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="ID" 
-                                    Binding="{Binding Id}"
-                                    Width="*"/>
-                                <DataGridTextColumn Header="ID номенклатуры" 
-                                    Binding="{Binding NomenclatureId}" 
-                                    Width="*"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                        <Button Content="Получить данные о партиях"
-                                Command="{Binding ReadPartiesCommand}"/>
-                    </Grid>
+                    <Frame Content="{Binding PartiesPage}"/>
                 </TabItem.Content>
             </TabItem>
             <TabItem Header="Номенклатуры">
                 <TabItem.Content>
-                    <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="50"/>
-                    </Grid.RowDefinitions>
-                    <DataGrid ItemsSource="{Binding Nomenclatures}">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" 
-                                    Binding="{Binding Id}"
-                                    Width="*"/>
-                            <DataGridTextColumn Header="Наименование" 
-                                    Binding="{Binding Name}" 
-                                    Width="*"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                    <Button Content="Получить данные о номенклатурах"
-                            Command="{Binding ReadNomenclaturesCommand}"/>
-                </Grid>
+                    <Frame Content="{Binding NomenclaturesPage}"/>
                 </TabItem.Content>
             </TabItem>
             <TabItem Header="Оборудование">
                 <TabItem.Content>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="50"/>
-                    </Grid.RowDefinitions>
-                    <DataGrid ItemsSource="{Binding MachineTools}">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" 
-                                    Binding="{Binding Id}"
-                                    Width="*"/>
-                            <DataGridTextColumn Header="Наименование" 
-                                    Binding="{Binding Name}" 
-                                    Width="*"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                    <Button Content="Получить данные об оборудовании"
-                            Command="{Binding ReadMachineToolsCommand}"/>
-                </Grid>
+                    <Frame Content="{Binding MachineToolsPage}"/>
                 </TabItem.Content>
             </TabItem>
             <TabItem Header="Операции">
                 <TabItem.Content>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="50"/>
-                    </Grid.RowDefinitions>
-                    <DataGrid ItemsSource="{Binding OperationTimes}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="ID оборудования" 
-                                    Binding="{Binding MachineToolId}" 
-                                    Width="*"/>
-                            <DataGridTextColumn Header="ID номенклатуры" 
-                                    Binding="{Binding NomenclatureId}" 
-                                    Width="*"/>
-                            <DataGridTextColumn Header="Время выполнения, с" 
-                                    Binding="{Binding ExecutionTime}" 
-                                    Width="*"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                    <Button Content="Получить данные о времени выполнения операций"
-                            Command="{Binding ReadOperationTimesCommand}"/>
-                </Grid>
+                    <Frame Content="{Binding OperationTimesPage}"/>
                 </TabItem.Content>
             </TabItem>
             <TabItem Header="Расписание">
-                
+                <TabItem.Content>
+                     <Frame Content="{Binding SchedulePage}"/>
+                </TabItem.Content>
             </TabItem>
         </TabControl>
         <StackPanel Orientation="Horizontal"

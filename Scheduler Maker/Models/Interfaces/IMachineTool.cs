@@ -1,6 +1,6 @@
 ﻿namespace SchedulerMaker.Models.Interfaces
 {
-    interface IMachineTool
+    public interface IMachineTool
     {
         int Id { get; }
 

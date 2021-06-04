@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ExcelDataReader;
 using SchedulerMaker.Models;
 using SchedulerMaker.Models.Interfaces;
-
+using ExcelDataReader.Exceptions;
 
 namespace SchedulerMaker.Repositories.ExcelRepositories
 {
-    class MachineToolsRepository : IRepository<IMachineTool>
+    public class MachineToolsRepository : IDataRepository<IMachineTool>
     {
         private readonly string _idFieldName = "id";
         private readonly string _nomenclatureFieldName = "name";
@@ -20,37 +18,54 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
 
         public MachineToolsRepository(string path)
         {
-            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read))
+            try
             {
-                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                using (var stream = File.Open(path, FileMode.Open, FileAccess.Read))
                 {
-                    var result = reader.AsDataSet();
-                    _machineTools = result;
+                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    {
+                        var result = reader.AsDataSet();
+                        _machineTools = result;
+                    }
                 }
+            }
+            catch (ExcelReaderException ex)
+            {
+                throw new ApplicationException(ex.Message);
+            }
+            catch (IOException ex)
+            {
+                throw new ApplicationException(ex.Message);
             }
         }
 
         public IEnumerable<IMachineTool> GetDataList()
         {
-            //TODO: обработать IOException
-            DataSet machineToolsDataSet = _machineTools;
-            ValidateDataSet(machineToolsDataSet);
-            DataTable machineToolsTable = machineToolsDataSet.Tables[0];
-            List<IMachineTool> machineToolsList = new List<IMachineTool>();
-            for (int i = 1; i < machineToolsTable.Rows.Count; ++i)
+            try
             {
-                DataRow row = machineToolsTable.Rows[i];
-                int id = Convert.ToInt32(row[0]);
-                string name = Convert.ToString(row[1]);
-                MachineTool machineTool = new MachineTool(id, name);
-
-                if (machineToolsList.Any((t) => t.Id == machineTool.Id))
+                DataSet machineToolsDataSet = _machineTools;
+                ValidateDataSet(machineToolsDataSet);
+                DataTable machineToolsTable = machineToolsDataSet.Tables[0];
+                List<IMachineTool> machineToolsList = new List<IMachineTool>();
+                for (int i = 1; i < machineToolsTable.Rows.Count; ++i)
                 {
-                    throw new ApplicationException("Есть совпадающие идентификаторы оборудования");
+                    DataRow row = machineToolsTable.Rows[i];
+                    int id = Convert.ToInt32(row[0]);
+                    string name = Convert.ToString(row[1]);
+                    IMachineTool machineTool = new MachineTool(id, name);
+
+                    if (machineToolsList.Any((t) => t.Id == machineTool.Id))
+                    {
+                        throw new ApplicationException("Есть совпадающие идентификаторы оборудования");
+                    }
+                    machineToolsList.Add(machineTool);
                 }
-                machineToolsList.Add(machineTool);
+                return machineToolsList;
             }
-            return machineToolsList;
+            catch (InvalidCastException)
+            {
+                throw new ApplicationException("В одной из строк неверно указано оборудование");
+            }
         }
 
         public void WriteDataList(IEnumerable<IMachineTool> data, string path)

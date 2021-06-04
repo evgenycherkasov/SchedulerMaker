@@ -1,0 +1,46 @@
+﻿<Page x:Class="SchedulerMaker.Views.Pages.MachineToolsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:SchedulerMaker.Views.Pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="MachineTools">
+
+    <Grid>
+        <Grid.Resources>
+            <Style TargetType="Button"
+                       BasedOn="{StaticResource MaterialDesignFlatButton}">
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Grid.Row" Value="1"/>
+            </Style>
+            <Style TargetType="DataGrid"
+                       BasedOn="{StaticResource MaterialDesignDataGrid}">
+                <Setter Property="Grid.Row" Value="0"/>
+                <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+                <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+                <Setter Property="IsReadOnly" Value="True"/>
+                <Setter Property="AutoGenerateColumns" Value="False"/>
+            </Style>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        <DataGrid ItemsSource="{Binding MachineTools}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" 
+                                    Binding="{Binding Id}"
+                                    Width="*"/>
+                <DataGridTextColumn Header="Наименование" 
+                                    Binding="{Binding Name}" 
+                                    Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Content="Получить данные об оборудовании"
+                            Command="{Binding ReadMachineToolsCommand}"/>
+    </Grid>
+</Page>

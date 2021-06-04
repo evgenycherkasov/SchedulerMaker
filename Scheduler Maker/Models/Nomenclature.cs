@@ -2,7 +2,7 @@
 
 namespace SchedulerMaker.Models
 {
-    class Nomenclature : INomenclature
+    public class Nomenclature : INomenclature
     {
         public int Id { get; }
 

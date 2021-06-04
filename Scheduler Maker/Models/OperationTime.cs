@@ -2,7 +2,7 @@
 
 namespace SchedulerMaker.Models
 {
-    class OperationTime : IOperationTime
+    public class OperationTime : IOperationTime
     {
         public int MachineToolId { get; }
 

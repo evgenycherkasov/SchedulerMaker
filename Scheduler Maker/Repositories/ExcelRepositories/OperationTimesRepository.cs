@@ -6,12 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ExcelDataReader;
+using ExcelDataReader.Exceptions;
 using SchedulerMaker.Models;
 using SchedulerMaker.Models.Interfaces;
 
 namespace SchedulerMaker.Repositories.ExcelRepositories
 {
-    class OperationTimesRepository : IRepository<IOperationTime>
+    public class OperationTimesRepository : IDataRepository<IOperationTime>
     {
         private readonly string _machineToolIdFieldName = "machine tool id";
         private readonly string _nomenclatureIdFieldName = "nomenclature id";
@@ -21,39 +22,52 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
 
         public OperationTimesRepository(string path)
         {
-            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read))
+            try
             {
-                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                using (var stream = File.Open(path, FileMode.Open, FileAccess.Read))
                 {
-                    var result = reader.AsDataSet();
-                    _operationTimes = result;
+                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    {
+                        var result = reader.AsDataSet();
+                        _operationTimes = result;
+                    }
                 }
+            }
+            catch (ExcelReaderException ex)
+            {
+                throw new ApplicationException(ex.Message);
+            }
+            catch (IOException ex)
+            {
+                throw new ApplicationException(ex.Message);
             }
         }
 
         public IEnumerable<IOperationTime> GetDataList()
         {
-            //TODO: обработать IOException
-            DataSet operationTimesDataSet = _operationTimes;
-            ValidateDataSet(operationTimesDataSet);
-            DataTable operationTimesTable = operationTimesDataSet.Tables[0];
-            List<IOperationTime> operationTimesList = new List<IOperationTime>();
-            for (int i = 1; i < operationTimesTable.Rows.Count; ++i)
+            try
             {
-                DataRow row = operationTimesTable.Rows[i];
-                int mtId = Convert.ToInt32(row[0]);
-                int nomenclatureId = Convert.ToInt32(row[1]);
-                int executionTime = Convert.ToInt32(row[2]);
-                OperationTime operation = new OperationTime(mtId, nomenclatureId, executionTime);
+                DataSet operationTimesDataSet = _operationTimes;
+                ValidateDataSet(operationTimesDataSet);
+                DataTable operationTimesTable = operationTimesDataSet.Tables[0];
+                List<IOperationTime> operationTimesList = new List<IOperationTime>();
+                for (int i = 1; i < operationTimesTable.Rows.Count; ++i)
+                {
+                    DataRow row = operationTimesTable.Rows[i];
+                    int mtId = Convert.ToInt32(row[0]);
+                    int nomenclatureId = Convert.ToInt32(row[1]);
+                    int executionTime = Convert.ToInt32(row[2]);
+                    IOperationTime operation = new OperationTime(mtId, nomenclatureId, executionTime);
 
-                operationTimesList.Add(operation);
+                    operationTimesList.Add(operation);
+                }
+                return operationTimesList;
             }
-            return operationTimesList;
-        }
-
-        public void WriteDataList(IEnumerable<IOperationTime> data, string path)
-        {
-            throw new NotImplementedException();
+            catch (InvalidCastException)
+            {
+                throw new ApplicationException("В одной из строк неверно указана операция");
+            }
+            
         }
 
         private void ValidateDataSet(DataSet data)

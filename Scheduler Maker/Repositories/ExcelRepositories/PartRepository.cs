@@ -8,10 +8,11 @@ using System.Data;
 using ExcelDataReader;
 using System.IO;
 using SchedulerMaker.Models;
+using ExcelDataReader.Exceptions;
 
 namespace SchedulerMaker.Repositories.ExcelRepositories
 {
-    class PartRepository : IRepository<IPart>
+    public class PartRepository : IDataRepository<IPart>
     {
         private readonly string _idFieldName = "id";
         private readonly string _nomenclatureIdFieldName = "nomenclature id";
@@ -19,42 +20,54 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
 
         public PartRepository(string path)
         {
-            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read))
+            try
             {
-                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                using (var stream = File.Open(path, FileMode.Open, FileAccess.Read))
                 {
-                    var result = reader.AsDataSet();
-                    _parties = result;
+                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    {
+                        var result = reader.AsDataSet();
+                        _parties = result;
+                    }
                 }
+            }
+            catch (ExcelReaderException ex)
+            {
+                throw new ApplicationException(ex.Message);
+            }
+            catch (IOException ex)
+            {
+                throw new ApplicationException(ex.Message);
             }
         }
 
         public IEnumerable<IPart> GetDataList()
         {
-            //TODO: обработать IOException
-            DataSet partiesDataSet = _parties;
-            ValidateDataSet(partiesDataSet);
-            DataTable partiesTable = partiesDataSet.Tables[0];
-            List<IPart> partiesList = new List<IPart>();
-            for (int i = 1; i < partiesTable.Rows.Count; ++i)
+            try
             {
-                DataRow row = partiesTable.Rows[i];
-                int id = Convert.ToInt32(row[0]);
-                int nomenclatureId = Convert.ToInt32(row[1]);
-                Part part = new Part(id, nomenclatureId);
-
-                if (partiesList.Any((t) => t.Id == part.Id))
+                DataSet partiesDataSet = _parties;
+                ValidateDataSet(partiesDataSet);
+                DataTable partiesTable = partiesDataSet.Tables[0];
+                List<IPart> partiesList = new List<IPart>();
+                for (int i = 1; i < partiesTable.Rows.Count; ++i)
                 {
-                    throw new ApplicationException("Есть совпадающие идентификаторы партии");
-                }
-                partiesList.Add(part);
-            }
-            return partiesList;
-        }
+                    DataRow row = partiesTable.Rows[i];
+                    int id = Convert.ToInt32(row[0]);
+                    int nomenclatureId = Convert.ToInt32(row[1]);
+                    IPart part = new Part(id, nomenclatureId);
 
-        public void WriteDataList(IEnumerable<IPart> data, string path)
-        {
-            throw new NotImplementedException();
+                    if (partiesList.Any((t) => t.Id == part.Id))
+                    {
+                        throw new ApplicationException("Есть совпадающие идентификаторы партии");
+                    }
+                    partiesList.Add(part);
+                }
+                return partiesList;
+            }
+            catch (InvalidCastException)
+            {
+                throw new ApplicationException("В одной из строк неверно указана партия");
+            }
         }
 
         private void ValidateDataSet(DataSet data)

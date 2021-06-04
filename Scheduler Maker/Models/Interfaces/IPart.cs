@@ -1,6 +1,6 @@
 ﻿namespace SchedulerMaker.Models.Interfaces
 {
-    interface IPart
+    public interface IPart
     {
         int Id { get; }
 

@@ -2,7 +2,7 @@
 
 namespace SchedulerMaker.Models
 {
-    class MachineTool : IMachineTool
+    public class MachineTool : IMachineTool
     {
         public int Id { get; }
 

@@ -1,4 +1,5 @@
 ﻿using ExcelDataReader;
+using ExcelDataReader.Exceptions;
 using SchedulerMaker.Models;
 using SchedulerMaker.Models.Interfaces;
 using System;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace SchedulerMaker.Repositories.ExcelRepositories
 {
-    class NomenclaturesRepository : IRepository<INomenclature>
+    public class NomenclaturesRepository : IDataRepository<INomenclature>
     {
         private readonly string _idFieldName = "id";
         private readonly string _nomenclatureFieldName = "nomenclature";
@@ -19,41 +20,53 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
 
         public NomenclaturesRepository(string path)
         {
-            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read))
+            try
             {
-                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                using (var stream = File.Open(path, FileMode.Open, FileAccess.Read))
                 {
-                    var result = reader.AsDataSet();
-                    _nomenclatures = result;
+                    using (var reader = ExcelReaderFactory.CreateReader(stream))
+                    {
+                        var result = reader.AsDataSet();
+                        _nomenclatures = result;
+                    }
                 }
+            }
+            catch (ExcelReaderException ex) 
+            { 
+                throw new ApplicationException(ex.Message); 
+            }
+            catch (IOException ex)
+            {
+                throw new ApplicationException(ex.Message);
             }
         }
         public IEnumerable<INomenclature> GetDataList()
         {
-            //TODO: обработать IOException
-            DataSet nomenclaturesDataSet = _nomenclatures;
-            ValidateDataSet(nomenclaturesDataSet);
-            DataTable nomenclaturesTable = nomenclaturesDataSet.Tables[0];
-            List<INomenclature> nomenclaturesList = new List<INomenclature>();
-            for (int i = 1; i < nomenclaturesTable.Rows.Count; ++i)
+            try
             {
-                DataRow row = nomenclaturesTable.Rows[i];
-                int id = Convert.ToInt32(row[0]);
-                string nomenclatureName = Convert.ToString(row[1]);
-                Nomenclature nomenclature = new Nomenclature(id, nomenclatureName);
-
-                if (nomenclaturesList.Any((t) => t.Id == nomenclature.Id))
+                DataSet nomenclaturesDataSet = _nomenclatures;
+                ValidateDataSet(nomenclaturesDataSet);
+                DataTable nomenclaturesTable = nomenclaturesDataSet.Tables[0];
+                List<INomenclature> nomenclaturesList = new List<INomenclature>();
+                for (int i = 1; i < nomenclaturesTable.Rows.Count; ++i)
                 {
-                    throw new ApplicationException("Есть совпадающие идентификаторы номенклатуры");
-                }
-                nomenclaturesList.Add(nomenclature);
-            }
-            return nomenclaturesList;
-        }
+                    DataRow row = nomenclaturesTable.Rows[i];
+                    int id = Convert.ToInt32(row[0]);
+                    string nomenclatureName = Convert.ToString(row[1]);
+                    INomenclature nomenclature = new Nomenclature(id, nomenclatureName);
 
-        public void WriteDataList(IEnumerable<INomenclature> data, string path)
-        {
-            throw new NotImplementedException();
+                    if (nomenclaturesList.Any((t) => t.Id == nomenclature.Id))
+                    {
+                        throw new ApplicationException("Есть совпадающие идентификаторы номенклатуры");
+                    }
+                    nomenclaturesList.Add(nomenclature);
+                }
+                return nomenclaturesList;
+            }
+            catch (InvalidCastException)
+            {
+                throw new ApplicationException("В одной из строк неверно указаны данные о номенклатуре");
+            }
         }
 
         private void ValidateDataSet(DataSet data)

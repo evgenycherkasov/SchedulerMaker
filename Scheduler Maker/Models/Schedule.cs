@@ -3,7 +3,7 @@ using System;
 
 namespace SchedulerMaker.Models
 {
-    class Schedule : ISchedule
+    public class Schedule : ISchedule
     {
         public IPart Part { get; }
 

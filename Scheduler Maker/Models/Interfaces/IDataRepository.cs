@@ -2,7 +2,7 @@
 
 namespace SchedulerMaker.Models.Interfaces
 {
-    interface IRepository<T>
+    public interface IDataRepository<T>
         where T : class
     {
         IEnumerable<T> GetDataList();

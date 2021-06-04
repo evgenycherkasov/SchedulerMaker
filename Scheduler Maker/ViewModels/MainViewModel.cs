@@ -1,26 +1,38 @@
 ﻿using Microsoft.Win32;
 using Prism.Commands;
 using Prism.Mvvm;
+using SchedulerMaker.Models;
 using SchedulerMaker.Models.Interfaces;
 using SchedulerMaker.Repositories.ExcelRepositories;
+using SchedulerMaker.Views.Pages;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace SchedulerMaker.ViewModels
 {
-    class MainViewModel : BindableBase
+    public class MainViewModel : BindableBase
     {
+        #region Pages
+
+        public MainMenuPage MainMenuPage { get; } = null;
+        public PartiesPage PartiesPage { get; } = null;
+        public NomenclaturesPage NomenclaturesPage { get; } = null;
+        public MachineToolsPage MachineToolsPage { get; } = null;
+        public OperationTimesPage OperationTimesPage { get; } = null;
+        public SchedulePage SchedulePage { get; } = null;
+
+        #endregion
+
         #region Repositories
 
-        public MachineToolsRepository MachineToolsRepo { get; set; } = null;
-        public PartRepository PartiesRepo { get; set; } = null;
-        public NomenclaturesRepository NomenclaturesRepo { get; set; } = null;
-        public OperationTimesRepository OperationTimesRepo { get; set; } = null;
+        public IDataRepository<IMachineTool> MachineToolsRepo { get; private set; } = null;
+        public IDataRepository<IPart> PartiesRepo { get; private set; } = null;
+        public IDataRepository<INomenclature> NomenclaturesRepo { get; private set; } = null;
+        public IDataRepository<IOperationTime> OperationTimesRepo { get; private set; } = null;
+        public IScheduleRepository<ISchedule> ScheduleRepository { get; private set; } = null;
 
         #endregion
 
@@ -34,139 +46,221 @@ namespace SchedulerMaker.ViewModels
         public DelegateCommand ReadMachineToolsCommand { get; private set; }
         public DelegateCommand ReadNomenclaturesCommand { get; private set; }
         public DelegateCommand ReadOperationTimesCommand { get; private set; }
-        public DelegateCommand UploadAllData { get; private set; }
+        public DelegateCommand UploadAllDataCommand { get; private set; }
+        public DelegateCommand MakeScheduleCommand { get; private set; }
+        public DelegateCommand UnloadAllDataCommand { get; private set; }
 
         public MainViewModel()
         {
-            UploadAllData = new DelegateCommand(() =>
+            MainMenuPage = new MainMenuPage(this);
+            PartiesPage = new PartiesPage(this);
+            NomenclaturesPage = new NomenclaturesPage(this);
+            MachineToolsPage = new MachineToolsPage(this);
+            OperationTimesPage = new OperationTimesPage(this);
+            SchedulePage = new SchedulePage(this);
+
+            UploadAllDataCommand = new DelegateCommand(UploadAllDataCommandHandler);
+
+            MakeScheduleCommand = new DelegateCommand(MakeScheduleCommandHandler);
+
+            UnloadAllDataCommand = new DelegateCommand(UnloadAllDataCommandHandler);
+
+            ReadPartiesCommand = new DelegateCommand(ReadPartiesCommandHandler);
+
+            ReadMachineToolsCommand = new DelegateCommand(ReadMachineToolsCommandHandler);
+
+            ReadNomenclaturesCommand = new DelegateCommand(ReadNomenclaturesCommandHandler);
+
+            ReadOperationTimesCommand = new DelegateCommand(ReadOperationTimesCommandHandler);
+        }
+
+        private void UploadAllDataCommandHandler()
+        {
+            try
             {
-                try
-                {
-                    ReadPartiesCommand.Execute();
-                    ReadMachineToolsCommand.Execute();
-                    ReadNomenclaturesCommand.Execute();
-                    ReadOperationTimesCommand.Execute();
-                }
-                catch (ApplicationException ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-            });
-
-            ReadPartiesCommand = new DelegateCommand(() =>
+                ReadPartiesCommand.Execute();
+                ReadMachineToolsCommand.Execute();
+                ReadNomenclaturesCommand.Execute();
+                ReadOperationTimesCommand.Execute();
+            }
+            catch (ApplicationException ex)
             {
-                try
-                {
-                    Parties.Clear();
+                MessageBox.Show(ex.Message);
+            }
+        }
 
-                    OpenFileDialog ofd = new OpenFileDialog
-                    {
-                        Filter = "Excel|*.xls;*.xlsx",
-                        Title = "Откройте файл с партиями"
-                    };
-
-                    if (ofd.ShowDialog() != true)
-                    {
-                        return;
-                    }
-
-                    string filePath = ofd.FileName;
-                    PartiesRepo = new PartRepository(filePath);
-                    var parties = PartiesRepo.GetDataList();
-                    Parties.AddRange(parties);
-                }
-                catch (ApplicationException ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-            });
-
-            ReadMachineToolsCommand = new DelegateCommand(() =>
+        private void MakeScheduleCommandHandler()
+        {
+            try
             {
-                try
+                Schedule.Clear();
+                List<IMachineTool> machineTools = MachineTools.ToList();
+                List<IPart> parties = Parties.ToList();
+                List<IOperationTime> operationTimes = OperationTimes.ToList();
+
+                if (machineTools.Count == 0)
                 {
-                    MachineTools.Clear();
-
-                    OpenFileDialog ofd = new OpenFileDialog
-                    {
-                        Filter = "Excel|*.xls;*.xlsx",
-                        Title = "Откройте файл с оборудованием"
-                    };
-
-                    if (ofd.ShowDialog() != true)
-                    {
-                        return;
-                    }
-
-                    string filePath = ofd.FileName;
-
-                    MachineToolsRepo = new MachineToolsRepository(filePath);
-                    var machineTools = MachineToolsRepo.GetDataList();
-                    MachineTools.AddRange(machineTools);
+                    throw new ApplicationException("Нет доступного оборудования");
                 }
-                catch (ApplicationException ex)
+                if (parties.Count == 0)
                 {
-                    MessageBox.Show(ex.Message);
+                    throw new ApplicationException("Нет партий для обработки");
                 }
-            });
+                if (operationTimes.Count == 0)
+                {
+                    throw new ApplicationException("Нет параметров, задающих обработку");
+                }
 
-            ReadNomenclaturesCommand = new DelegateCommand(() =>
+                Scheduler scheduler = new Scheduler();
+                scheduler.WarningEvent += ShowWarningHandler;
+                List<ISchedule> schedule = scheduler.MakeSchedule(machineTools, operationTimes, parties);
+                scheduler.WarningEvent -= ShowWarningHandler;
+                Schedule.AddRange(schedule);
+            }
+            catch (ApplicationException ex)
             {
-                try
-                {
-                    Nomenclatures.Clear();
+                MessageBox.Show(ex.Message);
+            }
+        }
 
-                    OpenFileDialog ofd = new OpenFileDialog
-                    {
-                        Filter = "Excel|*.xls;*.xlsx",
-                        Title = "Откройте файл с номенклатурой"
-                    };
+        private void UnloadAllDataCommandHandler()
+        {
+            IEnumerable<ISchedule> schedule = Schedule.ToList();
 
-                    if (ofd.ShowDialog() != true)
-                    {
-                        return;
-                    }
-
-                    string filePath = ofd.FileName;
-                    NomenclaturesRepo = new NomenclaturesRepository(filePath);
-                    var nomenclatures = NomenclaturesRepo.GetDataList();
-                    Nomenclatures.AddRange(nomenclatures);
-                }
-                catch (ApplicationException ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-
-            });
-
-            ReadOperationTimesCommand = new DelegateCommand(() =>
+            OpenFileDialog ofd = new OpenFileDialog
             {
-                try
+                Filter = "Excel|*.xls;*.xlsx",
+                Title = "Откройте файл Excel фалй для сохранения"
+            };
+
+            if (ofd.ShowDialog() != true)
+            {
+                return;
+            }
+
+            string filePath = ofd.FileName;
+
+            ScheduleRepository = new ScheduleRepository(filePath);
+
+            ScheduleRepository.UnloadData(schedule);
+        }
+
+        private void ReadPartiesCommandHandler()
+        {
+            try
+            {
+                Parties.Clear();
+
+                OpenFileDialog ofd = new OpenFileDialog
                 {
-                    OperationTimes.Clear();
+                    Filter = "Excel|*.xls;*.xlsx",
+                    Title = "Откройте файл с партиями"
+                };
 
-                    OpenFileDialog ofd = new OpenFileDialog
-                    {
-                        Filter = "Excel|*.xls;*.xlsx",
-                        Title = "Откройте файл с временами обработки партий"
-                    };
-
-                    if (ofd.ShowDialog() != true)
-                    {
-                        return;
-                    }
-
-                    string filePath = ofd.FileName;
-                    OperationTimesRepo = new OperationTimesRepository(filePath);
-                    var operationTimes = OperationTimesRepo.GetDataList();
-                    OperationTimes.AddRange(operationTimes);
-                }
-                catch (ApplicationException ex)
+                if (ofd.ShowDialog() != true)
                 {
-                    MessageBox.Show(ex.Message);
+                    return;
                 }
 
-            });
+                string filePath = ofd.FileName;
+                PartiesRepo = new PartRepository(filePath);
+                var parties = PartiesRepo.GetDataList();
+                Parties.AddRange(parties);
+            }
+            catch (ApplicationException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void ReadMachineToolsCommandHandler()
+        {
+            try
+            {
+                MachineTools.Clear();
+
+                OpenFileDialog ofd = new OpenFileDialog
+                {
+                    Filter = "Excel|*.xls;*.xlsx",
+                    Title = "Откройте файл с оборудованием"
+                };
+
+                if (ofd.ShowDialog() != true)
+                {
+                    return;
+                }
+
+                string filePath = ofd.FileName;
+
+                MachineToolsRepo = new MachineToolsRepository(filePath);
+                var machineTools = MachineToolsRepo.GetDataList();
+                MachineTools.AddRange(machineTools);
+            }
+            catch (ApplicationException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void ReadNomenclaturesCommandHandler()
+        {
+            try
+            {
+                Nomenclatures.Clear();
+
+                OpenFileDialog ofd = new OpenFileDialog
+                {
+                    Filter = "Excel|*.xls;*.xlsx",
+                    Title = "Откройте файл с номенклатурой"
+                };
+
+                if (ofd.ShowDialog() != true)
+                {
+                    return;
+                }
+
+                string filePath = ofd.FileName;
+                NomenclaturesRepo = new NomenclaturesRepository(filePath);
+                var nomenclatures = NomenclaturesRepo.GetDataList();
+                Nomenclatures.AddRange(nomenclatures);
+            }
+            catch (ApplicationException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void ReadOperationTimesCommandHandler()
+        {
+            try
+            {
+                OperationTimes.Clear();
+
+                OpenFileDialog ofd = new OpenFileDialog
+                {
+                    Filter = "Excel|*.xls;*.xlsx",
+                    Title = "Откройте файл с временами обработки партий"
+                };
+
+                if (ofd.ShowDialog() != true)
+                {
+                    return;
+                }
+
+                string filePath = ofd.FileName;
+                OperationTimesRepo = new OperationTimesRepository(filePath);
+                var operationTimes = OperationTimesRepo.GetDataList();
+                OperationTimes.AddRange(operationTimes);
+            }
+            catch (ApplicationException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void ShowWarningHandler(string message)
+        {
+            MessageBox.Show(message);
         }
     }
 }

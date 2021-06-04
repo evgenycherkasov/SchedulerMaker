@@ -1,6 +1,6 @@
 ﻿namespace SchedulerMaker.Models.Interfaces
 {
-    interface INomenclature
+    public interface INomenclature
     {
         int Id { get; }
 
