@@ -4,13 +4,13 @@ namespace SchedulerMaker.Models
 {
     public class OperationTime : IOperationTime
     {
-        public int MachineToolId { get; }
+        public uint MachineToolId { get; }
 
-        public int NomenclatureId { get; }
+        public uint NomenclatureId { get; }
 
-        public int ExecutionTime { get; }
+        public uint ExecutionTime { get; }
 
-        public OperationTime(int mtId, int nomenclatureId, int executionTime)
+        public OperationTime(uint mtId, uint nomenclatureId, uint executionTime)
         {
             MachineToolId = mtId;
             NomenclatureId = nomenclatureId;

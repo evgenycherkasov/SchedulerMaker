@@ -4,11 +4,11 @@ namespace SchedulerMaker.Models
 {
     public class MachineTool : IMachineTool
     {
-        public int Id { get; }
+        public uint Id { get; }
 
         public string Name { get; }
 
-        public MachineTool(int id, string name)
+        public MachineTool(uint id, string name)
         {
             Id = id;
             Name = name;

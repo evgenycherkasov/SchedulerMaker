@@ -6,8 +6,8 @@
 
         IMachineTool MachineTool { get; }
 
-        int StartTime { get; }
+        uint StartTime { get; }
 
-        int EndTime { get; }
+        uint EndTime { get; }
     }
 }

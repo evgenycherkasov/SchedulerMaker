@@ -12,8 +12,8 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
 {
     public class MachineToolsRepository : IDataRepository<IMachineTool>
     {
-        private readonly string _idFieldName = "id";
-        private readonly string _nomenclatureFieldName = "name";
+        private const string _idFieldName = "id";
+        private const string _nomenclatureFieldName = "name";
         private readonly DataSet _machineTools = null;
 
         public MachineToolsRepository(string path)
@@ -50,7 +50,7 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
                 for (int i = 1; i < machineToolsTable.Rows.Count; ++i)
                 {
                     DataRow row = machineToolsTable.Rows[i];
-                    int id = Convert.ToInt32(row[0]);
+                    uint id = Convert.ToUInt32(row[0]);
                     string name = Convert.ToString(row[1]);
                     IMachineTool machineTool = new MachineTool(id, name);
 
@@ -63,6 +63,14 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
                 return machineToolsList;
             }
             catch (InvalidCastException)
+            {
+                throw new ApplicationException("В одной из строк неверно указано оборудование");
+            }
+            catch (FormatException)
+            {
+                throw new ApplicationException("В одной из строк неверно указано оборудование");
+            }
+            catch (OverflowException)
             {
                 throw new ApplicationException("В одной из строк неверно указано оборудование");
             }

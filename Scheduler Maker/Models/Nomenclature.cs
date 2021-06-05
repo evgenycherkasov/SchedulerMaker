@@ -4,11 +4,11 @@ namespace SchedulerMaker.Models
 {
     public class Nomenclature : INomenclature
     {
-        public int Id { get; }
+        public uint Id { get; }
 
         public string Name { get; }
 
-        public Nomenclature(int id, string name)
+        public Nomenclature(uint id, string name)
         {
             Id = id;
             Name = name;

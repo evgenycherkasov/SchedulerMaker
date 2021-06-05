@@ -2,8 +2,8 @@
 {
     public interface IPart
     {
-        int Id { get; }
+        uint Id { get; }
 
-        int NomenclatureId { get; }
+        uint NomenclatureId { get; }
     }
 }

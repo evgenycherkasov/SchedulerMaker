@@ -9,11 +9,11 @@ namespace SchedulerMaker.Models
 
         public IMachineTool MachineTool { get; }
 
-        public int StartTime { get; }
+        public uint StartTime { get; }
 
-        public int EndTime { get; }
+        public uint EndTime { get; }
 
-        public Schedule(IPart part, IMachineTool machineTool, int startTime, int endTime)
+        public Schedule(IPart part, IMachineTool machineTool, uint startTime, uint endTime)
         {
             Part = part;
             MachineTool = machineTool;

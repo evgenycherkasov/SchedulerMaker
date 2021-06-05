@@ -2,7 +2,7 @@
 {
     public interface INomenclature
     {
-        int Id { get; }
+        uint Id { get; }
 
         string Name { get; }
     }

@@ -10,13 +10,13 @@ namespace SchedulerMaker.Models
     {
         public List<ISchedule> ScheduleList { get; } = new List<ISchedule>();
 
-        private List<int> _timesOfExecution;
+        private List<uint> _timesOfExecution;
 
         public event Action<string> WarningEvent;
 
         public List<ISchedule> MakeSchedule(List<IMachineTool> machineTools, List<IOperationTime> operationTimes, List<IPart> parties)
         {
-            _timesOfExecution = new List<int>();
+            _timesOfExecution = new List<uint>();
             for (int i = 0; i < machineTools.Count; ++i)
             {
                 _timesOfExecution.Add(0);
@@ -24,7 +24,7 @@ namespace SchedulerMaker.Models
 
             foreach (var part in parties)
             {
-                int partId = part.NomenclatureId;
+                uint partId = part.NomenclatureId;
 
                 IEnumerable<IMachineTool> availableMachineTools = from op in operationTimes
                                                                   from mt in machineTools
@@ -39,15 +39,16 @@ namespace SchedulerMaker.Models
                 if (availableMachineTools.Count() == 0)
                 {
                     WarningEvent?.Invoke($"Нет доступного оборудования для обработки материала с идентификатором {part.Id}");
+                    continue;
                 }
 
                 IOperationTime prefferedOperation = availableOperations.MinBy((ot) => ot.ExecutionTime);
 
-                int indexOfPreferredAvailableMachine = prefferedOperation.MachineToolId;
-                int minTimeSpent = _timesOfExecution[indexOfPreferredAvailableMachine];
+                int indexOfPreferredAvailableMachine = (int)prefferedOperation.MachineToolId;
+                uint minTimeSpent = _timesOfExecution[indexOfPreferredAvailableMachine];
                 foreach (var mt in availableMachineTools)
                 {
-                    int index = mt.Id;
+                    int index = (int)mt.Id;
                     if (_timesOfExecution[index] < minTimeSpent)
                     {
                         minTimeSpent = _timesOfExecution[index];
@@ -59,9 +60,9 @@ namespace SchedulerMaker.Models
 
                 IOperationTime operationTime = operationTimes.Find((ot) => ot.NomenclatureId == partId && ot.MachineToolId == machineTool.Id);
 
-                int startTime = _timesOfExecution[indexOfPreferredAvailableMachine];
+                uint startTime = _timesOfExecution[indexOfPreferredAvailableMachine];
                 _timesOfExecution[indexOfPreferredAvailableMachine] += operationTime.ExecutionTime;
-                int endTime = _timesOfExecution[indexOfPreferredAvailableMachine];
+                uint endTime = _timesOfExecution[indexOfPreferredAvailableMachine];
 
                 ISchedule schedule = new Schedule(part, machineTool, startTime, endTime);
 

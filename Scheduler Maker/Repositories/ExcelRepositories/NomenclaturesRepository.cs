@@ -51,7 +51,7 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
                 for (int i = 1; i < nomenclaturesTable.Rows.Count; ++i)
                 {
                     DataRow row = nomenclaturesTable.Rows[i];
-                    int id = Convert.ToInt32(row[0]);
+                    uint id = Convert.ToUInt32(row[0]);
                     string nomenclatureName = Convert.ToString(row[1]);
                     INomenclature nomenclature = new Nomenclature(id, nomenclatureName);
 
@@ -64,6 +64,14 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
                 return nomenclaturesList;
             }
             catch (InvalidCastException)
+            {
+                throw new ApplicationException("В одной из строк неверно указаны данные о номенклатуре");
+            }
+            catch (FormatException)
+            {
+                throw new ApplicationException("В одной из строк неверно указаны данные о номенклатуре");
+            }
+            catch (OverflowException)
             {
                 throw new ApplicationException("В одной из строк неверно указаны данные о номенклатуре");
             }

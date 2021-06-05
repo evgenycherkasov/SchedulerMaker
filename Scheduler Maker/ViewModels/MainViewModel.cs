@@ -42,13 +42,13 @@ namespace SchedulerMaker.ViewModels
         public ObservableCollection<IOperationTime> OperationTimes { get; } = new ObservableCollection<IOperationTime>();
         public ObservableCollection<ISchedule> Schedule { get; } = new ObservableCollection<ISchedule>();
 
-        public DelegateCommand ReadPartiesCommand { get; private set; }
-        public DelegateCommand ReadMachineToolsCommand { get; private set; }
-        public DelegateCommand ReadNomenclaturesCommand { get; private set; }
-        public DelegateCommand ReadOperationTimesCommand { get; private set; }
-        public DelegateCommand UploadAllDataCommand { get; private set; }
-        public DelegateCommand MakeScheduleCommand { get; private set; }
-        public DelegateCommand UnloadAllDataCommand { get; private set; }
+        public DelegateCommand ReadPartiesCommand { get; }
+        public DelegateCommand ReadMachineToolsCommand { get; }
+        public DelegateCommand ReadNomenclaturesCommand { get; }
+        public DelegateCommand ReadOperationTimesCommand { get; }
+        public DelegateCommand UploadAllDataCommand { get; }
+        public DelegateCommand MakeScheduleCommand { get; }
+        public DelegateCommand UnloadAllDataCommand { get; }
 
         public MainViewModel()
         {
@@ -78,10 +78,10 @@ namespace SchedulerMaker.ViewModels
         {
             try
             {
-                ReadPartiesCommand.Execute();
-                ReadMachineToolsCommand.Execute();
-                ReadNomenclaturesCommand.Execute();
-                ReadOperationTimesCommand.Execute();
+                ReadPartiesCommandHandler();
+                ReadMachineToolsCommandHandler();
+                ReadNomenclaturesCommandHandler();
+                ReadOperationTimesCommandHandler();
             }
             catch (ApplicationException ex)
             {

@@ -52,8 +52,8 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
                 for (int i = 1; i < partiesTable.Rows.Count; ++i)
                 {
                     DataRow row = partiesTable.Rows[i];
-                    int id = Convert.ToInt32(row[0]);
-                    int nomenclatureId = Convert.ToInt32(row[1]);
+                    uint id = Convert.ToUInt32(row[0]);
+                    uint nomenclatureId = Convert.ToUInt32(row[1]);
                     IPart part = new Part(id, nomenclatureId);
 
                     if (partiesList.Any((t) => t.Id == part.Id))
@@ -65,6 +65,14 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
                 return partiesList;
             }
             catch (InvalidCastException)
+            {
+                throw new ApplicationException("В одной из строк неверно указана партия");
+            }
+            catch (FormatException)
+            {
+                throw new ApplicationException("В одной из строк неверно указана партия");
+            }
+            catch (OverflowException)
             {
                 throw new ApplicationException("В одной из строк неверно указана партия");
             }

@@ -2,10 +2,10 @@
 {
     public interface IOperationTime
     {
-        int MachineToolId { get; }
+        uint MachineToolId { get; }
 
-        int NomenclatureId { get; }
+        uint NomenclatureId { get; }
 
-        int ExecutionTime { get; }
+        uint ExecutionTime { get; }
     }
 }

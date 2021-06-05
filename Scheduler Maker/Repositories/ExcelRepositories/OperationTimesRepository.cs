@@ -54,9 +54,9 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
                 for (int i = 1; i < operationTimesTable.Rows.Count; ++i)
                 {
                     DataRow row = operationTimesTable.Rows[i];
-                    int mtId = Convert.ToInt32(row[0]);
-                    int nomenclatureId = Convert.ToInt32(row[1]);
-                    int executionTime = Convert.ToInt32(row[2]);
+                    uint mtId = Convert.ToUInt32(row[0]);
+                    uint nomenclatureId = Convert.ToUInt32(row[1]);
+                    uint executionTime = Convert.ToUInt32(row[2]);
                     IOperationTime operation = new OperationTime(mtId, nomenclatureId, executionTime);
 
                     operationTimesList.Add(operation);
@@ -67,7 +67,15 @@ namespace SchedulerMaker.Repositories.ExcelRepositories
             {
                 throw new ApplicationException("В одной из строк неверно указана операция");
             }
-            
+            catch (FormatException)
+            {
+                throw new ApplicationException("В одной из строк неверно указана операция");
+            }
+            catch (OverflowException)
+            {
+                throw new ApplicationException("В одной из строк неверно указана операция");
+            }
+
         }
 
         private void ValidateDataSet(DataSet data)
