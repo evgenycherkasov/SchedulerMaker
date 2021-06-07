@@ -16,60 +16,67 @@ namespace SchedulerMaker.Models
 
         public List<ISchedule> MakeSchedule(List<IMachineTool> machineTools, List<IOperationTime> operationTimes, List<IPart> parties)
         {
-            _timesOfExecution = new List<uint>();
-            for (int i = 0; i < machineTools.Count; ++i)
+            try
             {
-                _timesOfExecution.Add(0);
-            }
-
-            foreach (var part in parties)
-            {
-                uint partId = part.NomenclatureId;
-
-                IEnumerable<IMachineTool> availableMachineTools = from op in operationTimes
-                                                                  from mt in machineTools
-                                                                  where op.NomenclatureId == partId && mt.Id == op.MachineToolId
-                                                                  select mt;
-
-                IEnumerable<IOperationTime> availableOperations = from op in operationTimes
-                                                                  from mt in machineTools
-                                                                  where op.NomenclatureId == partId && mt.Id == op.MachineToolId
-                                                                  select op;
-
-                if (availableMachineTools.Count() == 0)
+                _timesOfExecution = new List<uint>();
+                for (int i = 0; i < machineTools.Count; ++i)
                 {
-                    WarningEvent?.Invoke($"Нет доступного оборудования для обработки материала с идентификатором {part.Id}");
-                    continue;
+                    _timesOfExecution.Add(0);
                 }
 
-                IOperationTime prefferedOperation = availableOperations.MinBy((ot) => ot.ExecutionTime);
-
-                int indexOfPreferredAvailableMachine = (int)prefferedOperation.MachineToolId;
-                uint minTimeSpent = _timesOfExecution[indexOfPreferredAvailableMachine];
-                foreach (var mt in availableMachineTools)
+                foreach (var part in parties)
                 {
-                    int index = (int)mt.Id;
-                    if (_timesOfExecution[index] < minTimeSpent)
+                    uint partId = part.NomenclatureId;
+
+                    IEnumerable<IMachineTool> availableMachineTools = from op in operationTimes
+                                                                      from mt in machineTools
+                                                                      where op.NomenclatureId == partId && mt.Id == op.MachineToolId
+                                                                      select mt;
+
+                    IEnumerable<IOperationTime> availableOperations = from op in operationTimes
+                                                                      from mt in machineTools
+                                                                      where op.NomenclatureId == partId && mt.Id == op.MachineToolId
+                                                                      select op;
+
+                    if (availableMachineTools.Count() == 0)
                     {
-                        minTimeSpent = _timesOfExecution[index];
-                        indexOfPreferredAvailableMachine = index;
+                        WarningEvent?.Invoke($"Нет доступного оборудования для обработки материала с идентификатором {part.Id}");
+                        continue;
                     }
+
+                    IOperationTime prefferedOperation = availableOperations.MinBy((ot) => ot.ExecutionTime);
+
+                    int indexOfPreferredAvailableMachine = (int)prefferedOperation.MachineToolId;
+                    uint minTimeSpent = _timesOfExecution[indexOfPreferredAvailableMachine];
+                    foreach (var mt in availableMachineTools)
+                    {
+                        int index = checked(int)mt.Id;
+                        if (_timesOfExecution[index] < minTimeSpent)
+                        {
+                            minTimeSpent = _timesOfExecution[index];
+                            indexOfPreferredAvailableMachine = index;
+                        }
+                    }
+
+                    IMachineTool machineTool = availableMachineTools.Single((mt) => mt.Id == indexOfPreferredAvailableMachine);
+
+                    IOperationTime operationTime = operationTimes.Find((ot) => ot.NomenclatureId == partId && ot.MachineToolId == machineTool.Id);
+
+                    uint startTime = _timesOfExecution[indexOfPreferredAvailableMachine];
+                    _timesOfExecution[indexOfPreferredAvailableMachine] += operationTime.ExecutionTime;
+                    uint endTime = _timesOfExecution[indexOfPreferredAvailableMachine];
+
+                    ISchedule schedule = new Schedule(part, machineTool, startTime, endTime);
+
+                    ScheduleList.Add(schedule);
                 }
 
-                IMachineTool machineTool = availableMachineTools.Single((mt) => mt.Id == indexOfPreferredAvailableMachine);
-
-                IOperationTime operationTime = operationTimes.Find((ot) => ot.NomenclatureId == partId && ot.MachineToolId == machineTool.Id);
-
-                uint startTime = _timesOfExecution[indexOfPreferredAvailableMachine];
-                _timesOfExecution[indexOfPreferredAvailableMachine] += operationTime.ExecutionTime;
-                uint endTime = _timesOfExecution[indexOfPreferredAvailableMachine];
-
-                ISchedule schedule = new Schedule(part, machineTool, startTime, endTime);
-
-                ScheduleList.Add(schedule);
+                return ScheduleList;
             }
-
-            return ScheduleList;
+            catch (OverflowException)
+            {
+                throw new ApplicationException("Слишком много доступного оборудования, произошло переполнение");
+            }
         }
     }
 }
